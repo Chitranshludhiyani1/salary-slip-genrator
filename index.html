@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Slip Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            min-height: 600px;
+        }
+        
+        .form-section {
+            flex: 1;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        
+        .preview-section {
+            flex: 1;
+            padding: 40px;
+            background: white;
+            border-left: 1px solid #e0e0e0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+        
+        .template-selector {
+            margin-bottom: 30px;
+        }
+        
+        .template-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        
+        .template-btn {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .template-btn:hover {
+            border-color: #2196F3;
+            color: #2196F3;
+        }
+        
+        .template-btn.active {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+        
+        .salary-slip {
+            border: 2px solid #333;
+            padding: 30px;
+            margin: 20px 0;
+            background: white;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .slip-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2196F3;
+        }
+        
+        .slip-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .employee-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dotted #ccc;
+        }
+        
+        .salary-details {
+            margin-top: 30px;
+        }
+        
+        .salary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .salary-table th,
+        .salary-table td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .salary-table th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        .total-row {
+            background: #e3f2fd;
+            font-weight: bold;
+        }
+        
+        .controls {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        /* Template Styles */
+        .template-corporate {
+            border-color: #1976D2;
+        }
+        
+        .template-corporate .slip-header {
+            background: linear-gradient(45deg, #1976D2, #42A5F5);
+            color: white;
+            padding: 20px;
+            margin: -30px -30px 30px -30px;
+        }
+        
+        .template-modern {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+        
+        .template-modern .slip-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            margin: -30px -30px 30px -30px;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .template-classic .salary-table {
+            border: 2px solid #333;
+        }
+        
+        .template-classic .salary-table th {
+            background: #333;
+            color: white;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .salary-slip, .salary-slip * {
+                visibility: visible;
+            }
+            .salary-slip {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: none;
+            }
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .employee-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧾 Salary Slip Generator</h1>
+            <p>Create professional salary slips with multiple templates</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="form-section">
+                <div class="template-selector">
+                    <label><strong>Choose Template:</strong></label>
+                    <div class="template-buttons">
+                        <button class="template-btn active" onclick="changeTemplate('basic')">Basic</button>
+                        <button class="template-btn" onclick="changeTemplate('corporate')">Corporate</button>
+                        <button class="template-btn" onclick="changeTemplate('modern')">Modern</button>
+                        <button class="template-btn" onclick="changeTemplate('classic')">Classic</button>
+                    </div>
+                </div>
+                
+                <form id="salaryForm">
+                    <h3 style="margin-bottom: 20px; color: #333;">Employee Information</h3>
+                    
+                    <div class="form-group">
+                        <label>Employee Name *</label>
+                        <input type="text" id="employeeName" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>PAN Card Number</label>
+                            <input type="text" id="panCard" placeholder="ABCDE1234F">
+                        </div>
+                        <div class="form-group">
+                            <label>Aadhar Card Number</label>
+                            <input type="text" id="aadharCard" placeholder="1234 5678 9012">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input type="date" id="dob">
+                        </div>
+                        <div class="form-group">
+                            <label>Department</label>
+                            <input type="text" id="department" placeholder="IT Department">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Designation</label>
+                        <input type="text" id="designation" placeholder="Software Engineer">
+                    </div>
+                    
+                    <h3 style="margin: 30px 0 20px; color: #333;">Bank Information</h3>
+                    
+                    <div class="form-group">
+                        <label>Bank Name</label>
+                        <input type="text" id="bankName" placeholder="State Bank of India">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Account Number</label>
+                            <input type="text" id="accountNo" placeholder="1234567890">
+                        </div>
+                        <div class="form-group">
+                            <label>IFSC Code</label>
+                            <input type="text" id="ifscCode" placeholder="SBIN0001234">
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin: 30px 0 20px; color: #333;">Company Information</h3>
+                    
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" id="companyName" placeholder="ABC Technologies Pvt Ltd">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Salary Month/Year</label>
+                            <input type="month" id="salaryMonth">
+                        </div>
+                        <div class="form-group">
+                            <label>Basic Salary (₹)</label>
+                            <input type="number" id="basicSalary" placeholder="25000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>HRA (₹)</label>
+                            <input type="number" id="hra" placeholder="12500">
+                        </div>
+                        <div class="form-group">
+                            <label>Transport Allowance (₹)</label>
+                            <input type="number" id="transport" placeholder="2000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Medical Allowance (₹)</label>
+                            <input type="number" id="medical" placeholder="1500">
+                        </div>
+                        <div class="form-group">
+                            <label>Other Allowances (₹)</label>
+                            <input type="number" id="otherAllowances" placeholder="1000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>PF Deduction (₹)</label>
+                            <input type="number" id="pfDeduction" placeholder="3000">
+                        </div>
+                        <div class="form-group">
+                            <label>Tax Deduction (₹)</label>
+                            <input type="number" id="taxDeduction" placeholder="2500">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="preview-section">
+                <h3 style="margin-bottom: 20px; color: #333;">Preview</h3>
+                <div id="salarySlip" class="salary-slip template-basic">
+                    <div class="slip-header">
+                        <div class="company-name" id="previewCompanyName">Company Name</div>
+                        <div class="slip-title">SALARY SLIP</div>
+                        <div style="margin-top: 10px;" id="previewSalaryMonth">Month: January 2024</div>
+                    </div>
+                    
+                    <div class="employee-info">
+                        <div>
+                            <div class="info-item">
+                                <span><strong>Name:</strong></span>
+                                <span id="previewEmployeeName">Employee Name</span>
+                            </div>
+                            <div class="info-item">
+                                <span><strong>Department:</strong></span>
+                                <span id="previewDepartment">Department</span>
+                            </div>
+                            <div class="info-item">
+                                <span><strong>Designation:</strong></span>
+                                <span id="previewDesignation">Designation</span>
+                            </div>
+                            <div class="info-item">
+                                <span><strong>PAN Card:</strong></span>
+                                <span id="previewPanCard">PAN Number</span>
+                            </div>
+                            <div class="info-item">
+                                <span><strong>Date of Birth:</strong></span>
+                                <span id="previewDob">DOB</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="info-item">
+                                <span><strong>Aadhar Card:</strong></span>
+                                <span id="previewAadharCard">Aadhar Number</span>
+                            </div>
+                            <div class="info-item">
+                                <span><strong>Bank Name:</strong></span>
+                                <span id="previewBankName">Bank Name</span>
+                            </div>
+                            <div class="info-item">
+                                <span><strong>Account No:</strong></span>
+                                <span id="previewAccountNo">Account Number</span>
+                            </div>
+                            <div class="info-item">
+                                <span><strong>IFSC Code:</strong></span>
+                                <span id="previewIfscCode">IFSC Code</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="salary-table">
+                        <thead>
+                            <tr>
+                                <th>Earnings</th>
+                                <th>Amount (₹)</th>
+                                <th>Deductions</th>
+                                <th>Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Basic Salary</td>
+                                <td id="previewBasicSalary">0</td>
+                                <td>PF Deduction</td>
+                                <td id="previewPfDeduction">0</td>
+                            </tr>
+                            <tr>
+                                <td>HRA</td>
+                                <td id="previewHra">0</td>
+                                <td>Tax Deduction</td>
+                                <td id="previewTaxDeduction">0</td>
+                            </tr>
+                            <tr>
+                                <td>Transport Allowance</td>
+                                <td id="previewTransport">0</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Medical Allowance</td>
+                                <td id="previewMedical">0</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Other Allowances</td>
+                                <td id="previewOtherAllowances">0</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Total Earnings</strong></td>
+                                <td><strong id="totalEarnings">0</strong></td>
+                                <td><strong>Total Deductions</strong></td>
+                                <td><strong id="totalDeductions">0</strong></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="3"><strong>NET SALARY</strong></td>
+                                <td><strong id="netSalary">0</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 40px; text-align: right;">
+                        <p><strong>Date:</strong> <span id="currentDate"></span></p>
+                        <p style="margin-top: 30px;"><strong>Authorized Signatory</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" onclick="generateSlip()">🔄 Update Slip</button>
+            <button class="btn btn-success" onclick="downloadSlip()">📥 Download PDF</button>
+            <button class="btn btn-primary" onclick="printSlip()">🖨️ Print</button>
+        </div>
+    </div>
+
+    <script>
+        let currentTemplate = 'basic';
+        
+        // Set current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString();
+        
+        // Set current month
+        const currentDate = new Date();
+        const currentMonth = currentDate.toISOString().slice(0, 7);
+        document.getElementById('salaryMonth').value = currentMonth;
+        updateSalaryMonth();
+        
+        // Real-time form updates
+        document.getElementById('salaryForm').addEventListener('input', generateSlip);
+        
+        function changeTemplate(template) {
+            currentTemplate = template;
+            
+            // Update active button
+            document.querySelectorAll('.template-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update slip template
+            const slip = document.getElementById('salarySlip');
+            slip.className = `salary-slip template-${template}`;
+        }
+        
+        function generateSlip() {
+            // Employee Info
+            document.getElementById('previewEmployeeName').textContent = 
+                document.getElementById('employeeName').value || 'Employee Name';
+            document.getElementById('previewDepartment').textContent = 
+                document.getElementById('department').value || 'Department';
+            document.getElementById('previewDesignation').textContent = 
+                document.getElementById('designation').value || 'Designation';
+            document.getElementById('previewPanCard').textContent = 
+                document.getElementById('panCard').value || 'PAN Number';
+            document.getElementById('previewAadharCard').textContent = 
+                document.getElementById('aadharCard').value || 'Aadhar Number';
+            document.getElementById('previewDob').textContent = 
+                formatDate(document.getElementById('dob').value) || 'DOB';
+            
+            // Company & Bank Info
+            document.getElementById('previewCompanyName').textContent = 
+                document.getElementById('companyName').value || 'Company Name';
+            document.getElementById('previewBankName').textContent = 
+                document.getElementById('bankName').value || 'Bank Name';
+            document.getElementById('previewAccountNo').textContent = 
+                document.getElementById('accountNo').value || 'Account Number';
+            document.getElementById('previewIfscCode').textContent = 
+                document.getElementById('ifscCode').value || 'IFSC Code';
+            
+            updateSalaryMonth();
+            calculateSalary();
+        }
+        
+        function updateSalaryMonth() {
+            const monthValue = document.getElementById('salaryMonth').value;
+            if (monthValue) {
+                const date = new Date(monthValue);
+                const monthName = date.toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+                document.getElementById('previewSalaryMonth').textContent = `Month: ${monthName}`;
+            }
+        }
+        
+        function calculateSalary() {
+            // Get values
+            const basic = parseInt(document.getElementById('basicSalary').value) || 0;
+            const hra = parseInt(document.getElementById('hra').value) || 0;
+            const transport = parseInt(document.getElementById('transport').value) || 0;
+            const medical = parseInt(document.getElementById('medical').value) || 0;
+            const otherAllowances = parseInt(document.getElementById('otherAllowances').value) || 0;
+            const pf = parseInt(document.getElementById('pfDeduction').value) || 0;
+            const tax = parseInt(document.getElementById('taxDeduction').value) || 0;
+            
+            // Update preview
+            document.getElementById('previewBasicSalary').textContent = basic;
+            document.getElementById('previewHra').textContent = hra;
+            document.getElementById('previewTransport').textContent = transport;
+            document.getElementById('previewMedical').textContent = medical;
+            document.getElementById('previewOtherAllowances').textContent = otherAllowances;
+            document.getElementById('previewPfDeduction').textContent = pf;
+            document.getElementById('previewTaxDeduction').textContent = tax;
+            
+            // Calculate totals
+            const totalEarnings = basic + hra + transport + medical + otherAllowances;
+            const totalDeductions = pf + tax;
+            const netSalary = totalEarnings - totalDeductions;
+            
+            document.getElementById('totalEarnings').textContent = totalEarnings;
+            document.getElementById('totalDeductions').textContent = totalDeductions;
+            document.getElementById('netSalary').textContent = netSalary;
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN');
+        }
+        
+        function printSlip() {
+            window.print();
+        }
+        
+        function downloadSlip() {
+            // Create a simple download by opening print dialog
+            // For a real PDF, you'd need a PDF library like jsPDF
+            const employeeName = document.getElementById('employeeName').value || 'Employee';
+            const month = document.getElementById('salaryMonth').value || 'current';
+            
+            // Simple way - open print dialog with suggestion to save as PDF
+            alert(`Please use your browser's print function and select "Save as PDF" to download.\nFile name suggestion: ${employeeName}_SalarySlip_${month}.pdf`);
+            window.print();
+        }
+        
+        // Initialize with sample data
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set some sample data
+            document.getElementById('employeeName').value = 'राम शर्मा';
+            document.getElementById('panCard').value = 'ABCDE1234F';
+            document.getElementById('aadharCard').value = '1234 5678 9012';
+            document.getElementById('department').value = 'IT Department';
+            document.getElementById('designation').value = 'Software Engineer';
+            document.getElementById('companyName').value = 'ABC Technologies Pvt Ltd';
+            document.getElementById('bankName').value = 'State Bank of India';
+            document.getElementById('accountNo').value = '1234567890';
+            document.getElementById('ifscCode').value = 'SBIN0001234';
+            document.getElementById('basicSalary').value = '25000';
+            document.getElementById('hra').value = '12500';
+            document.getElementById('transport').value = '2000';
+            document.getElementById('medical').value = '1500';
+            document.getElementById('otherAllowances').value = '1000';
+            document.getElementById('pfDeduction').value = '3000';
+            document.getElementById('taxDeduction').value = '2500';
+            document.getElementById('dob').value = '1990-01-15';
+            
+            generateSlip();
+        });
+    </script>
+</body>
+</html>
